@@ -5,7 +5,7 @@ const db = require('./config/db.js')
 const router = require('./router')
 
 const app = express()
-
+app.use(cors())
 app.use(express.json())
 
 db.connect((err) => {
