@@ -8,6 +8,7 @@ const List = () => {
   const [records, setRecords] = useState(0);
   const [paging, setPaging] = useState([]);
   const [pageNumber, setPN] = useState(1);
+  const [number, setNumber] = useState(0);
 
   const getProducts = async () => {
     try {
@@ -27,15 +28,18 @@ const List = () => {
       }
       console.log(paginate);
       setPaging(paginate);
+      setRecords(data.data.values.count_data)
       setPN(parseInt(data.data.values.page));
-    } catch (error) {}
+    } catch (error) { }
   };
 
   useEffect(() => {
     getProducts();
+    setNumber(pageNumber - 1)
   }, [pageNumber]);
   return (
-    <Navbar title="List">
+    <Navbar title="Product List">
+      Page {pageNumber} of {records} data
       <table class="table">
         <thead>
           <tr>
@@ -49,9 +53,10 @@ const List = () => {
           </tr>
         </thead>
         <tbody>
-          {products.map((i) => (
+          {products.map((i, idx) => (
+
             <tr key={i.id}>
-              <th scope="row">1</th>
+              <th scope="row">{((pageNumber - 1) * 9) + (idx + 1)}</th>
               <td>{i.nama}</td>
               <td>{i.deskripsi}</td>
               <td>{i.category_id}</td>
@@ -72,13 +77,13 @@ const List = () => {
       </table>
       <div id="paginate">
         {pageNumber === 1 ? (
-          <button className="btn btn-primary">prev</button>
+          <button className="btn btn-outline-primary"><i className="bi bi-chevron-left"></i></button>
         ) : (
           <button
-            className="btn btn-primary"
+            className="btn btn-outline-primary"
             onClick={() => setPN(pageNumber - 1)}
           >
-            prev
+            <i className="bi bi-chevron-left"></i>
           </button>
         )}
         &nbsp;
@@ -103,10 +108,10 @@ const List = () => {
         )}
         &nbsp;
         <button
-          className="btn btn-primary"
+          className="btn btn-outline-primary"
           onClick={() => setPN(pageNumber + 1)}
         >
-          next
+          <i className="bi bi-chevron-right"></i>
         </button>
       </div>
     </Navbar>
