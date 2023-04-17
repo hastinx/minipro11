@@ -11,7 +11,7 @@ module.exports = {
         if (result.length > 0) {
             return res.json({
                 status: 400,
-                message: 'Product already exist in this store'
+                message: 'Product already exist in your store'
             })
         }
 
@@ -48,19 +48,51 @@ module.exports = {
     getProduct: async (req, res) => {
 
         let query;
-        if (req.query.name === undefined || req.query.category === undefined) {
-            //pagination
-            query = await promise.query(`SELECT * FROM tb_mst_produk LIMIT ${req.query.length} OFFSET ${req.query.skip}`)
+        let skip = 0;
+        if (req.query.page > 1) skip = (req.query.page - 1) * 9
+
+        let sort = 'ASC';
+        if (req.query.sort !== undefined) sort = req.query.sort
+
+        let order = 'nama';
+        if (req.query.order !== undefined) order = req.query.order
+
+        console.log()
+        if (req.query.category !== "0") {
+            query = await promise.query(`SELECT pr.nama,pr.deskripsi,pr.qty,pr.price, ct.category_name FROM tb_mst_produk pr 
+            JOIN tb_mst_category ct ON pr.category_id = ct.id
+            WHERE pr.createdBy=${req.query.id} 
+            AND pr.category_id=${req.query.category} 
+            ORDER BY pr.${order} ${sort} 
+            LIMIT 9 
+            OFFSET ${skip}`)
+        } else if (req.query.product_name !== "") {
+            query = await promise.query(`SELECT pr.nama,pr.deskripsi,pr.qty,pr.price, ct.category_name FROM tb_mst_produk pr 
+            JOIN tb_mst_category ct ON pr.category_id = ct.id
+            WHERE pr.createdBy=${req.query.id} 
+            AND pr.nama LIKE'%${req.query.product_name}%' 
+            ORDER BY pr.${order} ${sort} 
+            LIMIT 9 
+            OFFSET ${skip}`)
         } else {
-            //search by name
-            query = await promise.query(`SELECT * FROM tb_mst_produk WHERE nama LIKE '%${req.query.name}%' OR category_id=${req.query.category} LIMIT ${req.query.length} OFFSET ${req.query.skip}`)
+            query = await promise.query(`SELECT pr.nama,pr.deskripsi,pr.qty,pr.price, ct.category_name FROM tb_mst_produk pr 
+            JOIN tb_mst_category ct ON pr.category_id = ct.id
+            WHERE pr.createdBy=${req.query.id} 
+            ORDER BY pr.${order} ${sort} 
+            LIMIT 9 
+            OFFSET ${skip}`)
         }
 
         const [result] = query
+        const [count] = await promise.query(`SELECT * FROM tb_mst_produk WHERE createdBy=${req.query.id} AND is_deleted=0`)
         console.log(result)
         res.json({
             status: 200,
-            values: result
+            values: {
+                result,
+                count_data: count.length,
+                page: req.query.page
+            }
         })
     },
 }
