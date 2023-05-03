@@ -5,7 +5,7 @@ const promise = db.promise()
 module.exports = {
     addProduct: async (req, res) => {
         const { name, desc, price, qty, category_id, image, createdBy } = req.body
-
+        console.log(desc)
         const [result] = await promise.query(`SELECT * FROM tb_mst_produk WHERE nama='${name}' AND createdBy=${createdBy}`)
         console.log(result)
         if (result.length > 0) {
@@ -28,7 +28,7 @@ module.exports = {
             createdBy,
             updatedBy) VALUES 
             ('${name}',
-            '${desc}',
+           '${desc}',
             ${price},
             ${qty},
             ${category_id},
@@ -59,6 +59,7 @@ module.exports = {
 
         console.log()
         if (req.query.category !== "0") {
+            console.log('get 1')
             query = await promise.query(`SELECT pr.nama,pr.deskripsi,pr.qty,pr.price, ct.category_name FROM tb_mst_produk pr 
             JOIN tb_mst_category ct ON pr.category_id = ct.id
             WHERE pr.createdBy=${req.query.id} 
@@ -67,6 +68,7 @@ module.exports = {
             LIMIT 9 
             OFFSET ${skip}`)
         } else if (req.query.product_name !== "") {
+            console.log('get 2')
             query = await promise.query(`SELECT pr.nama,pr.deskripsi,pr.qty,pr.price, ct.category_name FROM tb_mst_produk pr 
             JOIN tb_mst_category ct ON pr.category_id = ct.id
             WHERE pr.createdBy=${req.query.id} 
@@ -75,6 +77,7 @@ module.exports = {
             LIMIT 9 
             OFFSET ${skip}`)
         } else {
+            console.log('get 3')
             query = await promise.query(`SELECT pr.nama,pr.deskripsi,pr.qty,pr.price, ct.category_name FROM tb_mst_produk pr 
             JOIN tb_mst_category ct ON pr.category_id = ct.id
             WHERE pr.createdBy=${req.query.id} 

@@ -43,16 +43,20 @@ module.exports = {
     },
 
     login: async (req, res) => {
-        const { username, password } = req.body
+        const { email, password } = req.body
 
-        const [result] = await promise.query(`SELECT * FROM tb_mst_user WHERE username='${username}'`)
+        const [result] = await promise.query(`SELECT * FROM tb_mst_user WHERE email='${email}'`)
+        if (result.length === 0) {
+            return res.status(400).json({ message: "Account unregistered" })
 
+        }
         const isvalid = await bcrypt.compare(password, result[0].password)
 
         if (isvalid) {
             return res.json({
                 status: 200,
-                message: 'Login sucessfully'
+                message: 'Login sucessfully',
+                values: result
             })
         }
         res.json({
