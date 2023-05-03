@@ -16,20 +16,20 @@
 
 
 
-label {
+.label-form {
   text-align: left;
   padding: 0.25rem 0;
 
 }
 
-input {
+.input-form {
   margin: 0.5rem 0;
   padding: 1rem;
   border: none;
   border-radius: 10px;
 }
 
-button {
+.button-form {
   border: none;
   background-color: white;
   padding: 20px;
